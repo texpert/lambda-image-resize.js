@@ -1,20 +1,23 @@
 { "storages":
-  [ { "cache":
-  { "name": "texpert-test-cache",
-    "prefix": "cache" },
-    "store":
-    { "name": "texpert-test-store",
-      "prefix": "store" } } ],
-  "path": "user/36985/document/14/doc/d46bd213658257d4913247d62d74760f.jpg",
+  [
+    { "cache": { "name": "texpert-test-cache",
+                 "prefix": "cache" },
+    "store":   { "name": "texpert-test-store",
+                 "prefix": "store" }
+    }
+  ],
+  "path": "user/36985/document/14/doc/d46bd213658257d4913247d62d74760f.png",
   "callbackURL": "https://localhost:3000/rapi/documents/callbacks",
-  "original": {
-    "id": "aurel.png",
-    "storage": "cache",
-    "metadata": {
-      "size": 64684,
-      "filename": "aurel.png",
-      "mime_type": "image/png" } },
-  "versions": [
+  "original": { "id": "aurel.png",
+                "storage": "cache",
+                "targetStorage": "store",
+                "metadata": {
+                  "size": 64684,
+                  "filename": "aurel.png",
+                  "mime_type": "image/png" }
+  },
+  "versions":
+  [
     { "name": "size_40_40",
       "storage": "store",
       "width": 40,
@@ -25,7 +28,6 @@
       "storage": "store",
       "width": 50,
       "height": 50,
-      "background": "transparent",
-      "format": "png" }
+      "background": "transparent"}
   ]
 }
