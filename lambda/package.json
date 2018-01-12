@@ -4,11 +4,11 @@
   "description": "On demand image resizing AWS Lambda function",
   "author": "Aurel Branzeanu <branzeanu.aurel@gmail.com>",
   "license": "Apache-2.0",
-  "main": "imageResize.js",
+  "main": "index.js",
   "dependencies": {
-    "sharp": "^0.18.4"
+    "sharp": "^0.19"
   },
   "devDependencies": {
-    "aws-sdk": "^2.179.0"
+    "aws-sdk": "^2.179"
   }
 }
