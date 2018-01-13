@@ -3,6 +3,7 @@
 const AWS_S3 = require('aws-sdk/clients/s3');
 const S3 = new AWS_S3({ signatureVersion: 'v4' });
 const Sharp = require('sharp');
+const https = require('https');
 
 exports.handler = function(event, context, callback) {
   const { callbackURL, original, path, storages, versions } = event;
@@ -29,6 +30,23 @@ exports.handler = function(event, context, callback) {
       Promise.all(versionPromises)
         .then(function(values) {
           console.log('values:', values);
+          console.log('callbackURL:', callbackURL);
+
+          const req = https.request(callbackURL, (res) => {
+            console.log('statusCode:', res.statusCode);
+            console.log('headers:', res.headers);
+
+            res.on('data', (d) => {
+              process.stdout.write(d);
+            });
+          });
+
+          req.on('error', (e) => {
+            console.log(`problem with request: ${e.message}`);
+          });
+
+          req.write(JSON.stringify(values));
+          req.end();
         })
     })
     .catch(err => callback(err));
