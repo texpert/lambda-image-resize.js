@@ -28,7 +28,7 @@ exports.handler = function(event, context, callback) {
         formPath(originalTargetBucket, path, original), 'original'));
       Promise.all(versionPromises)
         .then(function(values) {
-          console.log('values:', values);
+          sendResult(callbackURL, values);
         })
     })
     .catch(err => callback(err));
@@ -75,4 +75,39 @@ function formPath({ prefix = null }, path, { format = null, id = null, name = nu
     result = result.join('/');
   }
   return result;
+}
+
+function sendResult (callbackURL, payload) {
+  const url = require('url');
+  const cb = url.parse(callbackURL);
+  const http = require(cb.protocol.slice(0, -1));
+
+  const options = {
+    port: cb.port,
+    hostname: cb.hostname,
+    path: cb.path,
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+
+  console.log('Starting PUT request to callbackURL:', callbackURL);
+  console.log('Payload:', payload);
+
+  const req = http.request(options, (res) => {
+    console.log('statusCode:', res.statusCode);
+    console.log('headers:', res.headers);
+
+    res.on('data', (d) => {
+      process.stdout.write(d);
+    });
+  });
+
+  req.on('error', (e) => {
+    console.log(`problem with request: ${e.message}`);
+  });
+
+  req.write(JSON.stringify(payload));
+  req.end();
 }

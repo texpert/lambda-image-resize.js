@@ -7,7 +7,7 @@
     }
   ],
   "path": "user/36985/document/14/doc/d46bd213658257d4913247d62d74760f.png",
-  "callbackURL": "https://localhost:3000/rapi/documents/callbacks",
+  "callbackURL": "http://docker.for.mac.localhost:3000/rapi/lambda",
   "original": { "id": "aurel.png",
                 "storage": "cache",
                 "targetStorage": "store",
