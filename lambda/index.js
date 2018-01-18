@@ -1,10 +1,10 @@
 'use strict';
 
-const AWS_S3 = require('aws-sdk/clients/s3');
-const S3 = new AWS_S3({ signatureVersion: 'v4' });
-const Sharp = require('sharp');
+const AWS = require("aws-sdk"),
+      S3 = new AWS.S3({ signatureVersion: 'v4' }),
+      Sharp = require('sharp');
 
-exports.handler = function(event, context, callback) {
+exports.handler = (event, context, callback) => {
   const { callbackURL, original, path, storages, versions } = event;
   console.log('Original:', original);
   console.log('Storages:', storages);
@@ -17,7 +17,7 @@ exports.handler = function(event, context, callback) {
     .then(
       callback(null, { statusCode: '200', body: { 'Message': 'Lambda started' } })
     )
-    .then(function (data) {
+    .then(data => {
       const versionPromises = [];
       for(const version of versions) {
         versionPromises.push(resizeToBucket(data, findBucket(storages, version.storage), path, version)
@@ -35,11 +35,11 @@ exports.handler = function(event, context, callback) {
 };
 
 function findBucket(storages, storageName) {
-  return (storages.find(function (obj) { return storageName in obj }))[storageName];
+  return (storages.find(obj => storageName in obj))[storageName];
 }
 
 function resizeToBucket(data, bucket, path, version) {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     const pipeline = Sharp(data.Body).resize(version.width, version.height);
     const format = version.format;
     if (format)
@@ -52,7 +52,7 @@ function resizeToBucket(data, bucket, path, version) {
 }
 
 function bufferToBucket(buffer, bucket, id, name) {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     S3.putObject({
         Body : buffer,
         Bucket : bucket,
@@ -78,36 +78,28 @@ function formPath({ prefix = null }, path, { format = null, id = null, name = nu
 }
 
 function sendResult (callbackURL, payload) {
-  const url = require('url');
-  const cb = url.parse(callbackURL);
-  const http = require(cb.protocol.slice(0, -1));
-
-  const options = {
-    port: cb.port,
-    hostname: cb.hostname,
-    path: cb.path,
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  };
-
   console.log('Starting PUT request to callbackURL:', callbackURL);
-  console.log('Payload:', payload);
 
-  const req = http.request(options, (res) => {
-    console.log('statusCode:', res.statusCode);
-    console.log('headers:', res.headers);
+  const endpoint = new AWS.Endpoint(callbackURL);
+  let request = new AWS.HttpRequest(endpoint);
+  request.region = process.env.AWS_REGION;
+  request.method = 'PUT';
+  request.headers['Content-Type'] = 'application/json';
+  request.headers['presigned-expires'] = 'false';
+  request.headers['Host'] = endpoint.host;
+  request.body = JSON.stringify(payload);
 
-    res.on('data', (d) => {
-      process.stdout.write(d);
-    });
+  const signer = new AWS.Signers.V4(request, process.env.AWS_LAMBDA_FUNCTION_NAME);
+  signer.addAuthorization(AWS.config.credentials, new Date());
+
+  console.log('Request:', request);
+
+  const send = new AWS.NodeHttpClient();
+  send.handleRequest(request, null, response => {
+    let respBody = '';
+    response.on('data', chunk => { respBody += chunk; });
+    response.on('end', () => { console.log('RESPONSE: ', respBody); });
+  }, err => {
+    console.log(`Error: ${err}`);
   });
-
-  req.on('error', (e) => {
-    console.log(`problem with request: ${e.message}`);
-  });
-
-  req.write(JSON.stringify(payload));
-  req.end();
 }
