@@ -85,7 +85,6 @@ function sendResult (callbackURL, payload) {
   request.region = process.env.AWS_REGION;
   request.method = 'PUT';
   request.headers['Content-Type'] = 'application/json';
-  request.headers['presigned-expires'] = 'false';
   request.headers['Host'] = endpoint.host;
   request.body = JSON.stringify(payload);
 
