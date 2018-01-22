@@ -1,14 +1,13 @@
 'use strict';
 
-const AWS = require("aws-sdk"),
-      S3 = new AWS.S3({ signatureVersion: 'v4' }),
+const AWS = require("aws-sdk/global"),
+      AWS_S3 = require('aws-sdk/clients/s3'),
+      S3 = new AWS_S3({ signatureVersion: 'v4' }),
       Sharp = require('sharp');
 
 exports.handler = (event, context, callback) => {
   const { callbackURL, original, path, storages, versions } = event;
-  console.log('Original:', original);
-  console.log('Storages:', storages);
-  console.log('Versions:', versions);
+  console.log('Started event:', event);
   const originalBucket = findBucket(storages, original.storage);
   const originalKey = originalBucket.prefix ? `${originalBucket.prefix}/${original.id}` : original.id;
   const originalTargetBucket = findBucket(storages, original.targetStorage);
