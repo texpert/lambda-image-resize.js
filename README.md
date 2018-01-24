@@ -34,17 +34,21 @@ You should have the following packages locally installed:
     $ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs6.10 npm install --prefix=lambda
     ```
 
-- The [AWS SAM Local][aws_sam_local] CLI tool for local development and testing of Serverless applications.
+- The [AWS SAM Local][aws_sam_local] CLI tool for local development and testing.
 
 
 ## Usage
 
 ### Local testing
 
-To invoke the function using the [AWS SAM Local][aws_sam_local] package with an [AWS credentials profile][aws_profile] 
-with a event.json 
-fixture 
-file, run the following command:
+First, install globally the [AWS SAM Local][aws_sam_local] package.
+
+```
+$ npm install -g aws-sam-local
+```
+
+To invoke the Lambda function using the [AWS SAM Local][aws_sam_local] with an [AWS credentials profile][aws_profile] 
+with a event.json fixture file, run the following command:
 
 ```
 $ sam local invoke "ImageResizeOnDemand" -e event.json -profile texpert

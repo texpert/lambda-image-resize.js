@@ -2,15 +2,15 @@
   [
     { "cache": { "name": "texpert-test-cache",
                  "prefix": "cache" },
-    "store":   { "name": "texpert-test-store",
+      "store": { "name": "texpert-test-store",
                  "prefix": "store" }
     }
   ],
   "path": "user/36985/document/14/doc/d46bd213658257d4913247d62d74760f.png",
-  "callbackURL": "http://docker.for.mac.localhost:3000/rapi/lambda",
+  "callbackURL": "http://texpert.localtunnel.me/rapi/lambda",
+  "targetStorage": "store",
   "original": { "id": "aurel.png",
                 "storage": "cache",
-                "targetStorage": "store",
                 "metadata": {
                   "size": 64684,
                   "filename": "aurel.png",
