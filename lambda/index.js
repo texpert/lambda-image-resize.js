@@ -6,19 +6,19 @@ const AWS = require("aws-sdk/global"),
       Sharp = require('sharp');
 
 exports.handler = (event, context, callback) => {
-  const { callbackURL, original, path, storages, versions } = event;
+  const { original, path, storages } = event;
   console.log('Started event:', event);
   const originalBucket = findBucket(storages, original.storage);
   const originalKey = originalBucket.prefix ? `${originalBucket.prefix}/${original.id}` : original.id;
-  const originalTargetBucket = findBucket(storages, original.targetStorage);
+  const originalTargetBucket = findBucket(storages, event.targetStorage);
 
   S3.getObject({ Bucket: originalBucket.name, Key: originalKey }).promise()
     .then(
       callback(null, { statusCode: '200', body: { 'Message': 'Lambda started' } })
     )
     .then(data => {
-      const versionPromises = [];
-      for(const version of versions) {
+      const versionPromises = [{ context: event.context }];
+      for(const version of event.versions) {
         versionPromises.push(resizeToBucket(data, findBucket(storages, version.storage), path, version)
           .catch(reason => console.log(`Error on version: ${version.name}, reason: ${reason}`))
         )
@@ -27,7 +27,7 @@ exports.handler = (event, context, callback) => {
         formPath(originalTargetBucket, path, original), 'original'));
       Promise.all(versionPromises)
         .then(function(values) {
-          sendResult(callbackURL, values);
+          sendResult(event.callbackURL, values);
         })
     })
     .catch(err => callback(err));
