@@ -6,11 +6,12 @@ const AWS = require("aws-sdk/global"),
       Sharp = require('sharp');
 
 exports.handler = (event, context, callback) => {
-  const { original, path, storages } = event;
   console.log('Started event:', event);
-  const originalBucket = findBucket(storages, original.storage);
-  const originalKey = originalBucket.prefix ? `${originalBucket.prefix}/${original.id}` : original.id;
-  const originalTargetBucket = findBucket(storages, event.targetStorage);
+
+  const { original, path, storages } = event,
+        originalBucket = storages[original.storage],
+        originalKey = originalBucket.prefix ? `${originalBucket.prefix}/${original.id}` : original.id,
+        targetBucket = storages[event.target];
 
   S3.getObject({ Bucket: originalBucket.name, Key: originalKey }).promise()
     .then(
@@ -19,12 +20,14 @@ exports.handler = (event, context, callback) => {
     .then(data => {
       const versionPromises = [{ context: event.context }];
       for(const version of event.versions) {
-        versionPromises.push(resizeToBucket(data, findBucket(storages, version.storage), path, version)
+        versionPromises.push(resizeToBucket(data, storages[version.storage], path, version)
           .catch(reason => console.log(`Error on version: ${version.name}, reason: ${reason}`))
         )
       }
-      versionPromises.push(bufferToBucket(data.Body, originalTargetBucket.name,
-        formPath(originalTargetBucket, path, original), 'original'));
+      versionPromises.push(bufferToBucket(data.Body, targetBucket.name,
+                                          formPath(targetBucket, path, original),
+                                          'original',
+                                          original.metadata));
       Promise.all(versionPromises)
         .then(function(values) {
           sendResult(event.callbackURL, values);
@@ -32,10 +35,6 @@ exports.handler = (event, context, callback) => {
     })
     .catch(err => callback(err));
 };
-
-function findBucket(storages, storageName) {
-  return (storages.find(obj => storageName in obj))[storageName];
-}
 
 function resizeToBucket(data, bucket, path, version) {
   return new Promise(resolve => {
@@ -50,14 +49,14 @@ function resizeToBucket(data, bucket, path, version) {
   });
 }
 
-function bufferToBucket(buffer, bucket, id, name) {
+function bufferToBucket(buffer, bucket, id, version_name, metadata = {}) {
   return new Promise(resolve => {
     S3.putObject({
         Body : buffer,
         Bucket : bucket,
         Key : id },
       () => { console.log('Buffer stored:', id);
-              resolve({ [`${name}`]: { store : bucket, id : id } }) }
+              resolve({ [`${version_name}`]: { storage : bucket, id : id, metadata : metadata } }) }
     );
   })
 }
