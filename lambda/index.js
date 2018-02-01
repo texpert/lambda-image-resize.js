@@ -8,60 +8,81 @@ const AWS = require("aws-sdk/global"),
 exports.handler = (event, context, callback) => {
   console.log('Started event:', event);
 
-  const { original, path, storages } = event,
-        originalBucket = storages[original.storage],
-        originalKey = originalBucket.prefix ? `${originalBucket.prefix}/${original.id}` : original.id,
-        targetBucket = storages[event.target];
+  const { attachment, copy_original, path, storages, versions } = event,
+        originalBucket = storages[attachment.storage],
+        originalKey = originalBucket.prefix ? `${originalBucket.prefix}/${attachment.id}` : attachment.id,
+        targetStorage = event.target_storage,
+        targetBucket = storages[targetStorage];
 
   S3.getObject({ Bucket: originalBucket.name, Key: originalKey }).promise()
     .then(
       callback(null, { statusCode: '200', body: { 'Message': 'Lambda started' } })
     )
     .then(data => {
-      const versionPromises = [{ context: event.context }];
-      for(const version of event.versions) {
-        versionPromises.push(resizeToBucket(data, storages[version.storage], path, version)
-          .catch(reason => console.log(`Error on version: ${version.name}, reason: ${reason}`))
-        )
-      }
-      versionPromises.push(bufferToBucket(data.Body, targetBucket.name,
-                                          formPath(targetBucket, path, original),
-                                          'original',
-                                          original.metadata));
+      const versionPromises = [];
+      if (versions)
+        for(const version of versions) {
+          versionPromises.push(resizeToBucket(data, storages, path, version)
+            .catch(reason => console.log(`Error on version: ${version.name}, reason: ${reason}`))
+          )
+        }
+      if (copy_original && copy_original === true)
+        versionPromises.push(bufferToBucket(data.Body, targetBucket,
+                                            formPath(targetBucket.prefix, path, attachment),
+                                            'original',
+                                            targetStorage,
+                                            attachment.metadata));
       Promise.all(versionPromises)
         .then(function(values) {
-          sendResult(event.callbackURL, values);
+          const payload = { context: event.context };
+
+          if (versions)
+            payload.versions = values;
+          else
+            payload.original = values[0].original;
+          sendResult(event.callbackURL, payload);
         })
     })
     .catch(err => callback(err));
 };
 
-function resizeToBucket(data, bucket, path, version) {
+function resizeToBucket(data, storages, path, version) {
   return new Promise(resolve => {
-    const pipeline = Sharp(data.Body).resize(version.width, version.height);
-    const format = version.format;
+    const pipeline = Sharp(data.Body).resize(version.width, version.height),
+          format = version.format,
+          storage = version.storage,
+          bucket = storages[storage];
+
     if (format)
       pipeline.toFormat(format);
     pipeline.toBuffer()
     .then((buffer) => {
-      resolve(bufferToBucket(buffer, bucket.name, formPath(bucket, path, version), version.name));
+      resolve(bufferToBucket(buffer, bucket, formPath(bucket.prefix, path, version), version.name, storage));
     })
   });
 }
 
-function bufferToBucket(buffer, bucket, id, version_name, metadata = {}) {
+function bufferToBucket(buffer, bucket, key, version_name, storage, metadata = {}) {
   return new Promise(resolve => {
     S3.putObject({
         Body : buffer,
-        Bucket : bucket,
-        Key : id },
-      () => { console.log('Buffer stored:', id);
-              resolve({ [`${version_name}`]: { storage : bucket, id : id, metadata : metadata } }) }
+        Bucket : bucket.name,
+        Key : key },
+      () => {
+        console.log('Buffer stored:', key);
+        const prefix = bucket.prefix;
+
+        // If the key is starting with the bucket.prefix, remove the prefix - it is a storage property
+        if (key.indexOf(prefix) === 0)
+          key = key.slice(prefix.length + 1);
+
+        resolve({ [`${version_name}`]: { storage : storage, id : key, metadata : metadata } })
+      }
     );
   })
 }
 
-function formPath({ prefix = null }, path, { format = null, id = null, name = null }) {
+function formPath(prefix = null, path, { format = null, name = null }) {
   let result = prefix ? `${prefix}/${path}` : path;
   if (name) {
     result = result.split('/');

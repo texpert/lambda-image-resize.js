@@ -5,14 +5,15 @@
                "prefix": "store" } },
   "path": "user/36985/document/14/doc/d46bd213658257d4913247d62d74760f.png",
   "callbackURL": "http://texpert.localtunnel.me/rapi/lambda",
-  "target": "store",
-  "context": { "record_id": 15, "record_class": "user", "name": "doc"},
-  "original": { "id": "aurel.png",
-                "storage": "cache",
-                "metadata": {
-                  "size": 64684,
-                  "filename": "aurel.png",
-                  "mime_type": "image/png" }
+  "target_storage": "store",
+  "copy_original": true,
+  "context": { "record": ["Document", 15], "name": "doc", "shrine_class": "LambdaUploader"},
+  "attachment": { "id": "aurel.png",
+                  "storage": "cache",
+                  "metadata": {
+                    "size": 64684,
+                    "filename": "aurel.png",
+                    "mime_type": "image/png" }
   },
   "versions":
   [
