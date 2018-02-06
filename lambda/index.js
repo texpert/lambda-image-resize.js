@@ -1,6 +1,6 @@
 'use strict';
 
-const AWS = require("aws-sdk/global"),
+const AWS = require('aws-sdk/global'),
       AWS_S3 = require('aws-sdk/clients/s3'),
       S3 = new AWS_S3({ signatureVersion: 'v4' }),
       Sharp = require('sharp');
@@ -15,9 +15,6 @@ exports.handler = (event, context, callback) => {
         targetBucket = storages[targetStorage];
 
   S3.getObject({ Bucket: originalBucket.name, Key: originalKey }).promise()
-    .then(
-      callback(null, { statusCode: '200', body: { 'Message': 'Lambda started' } })
-    )
     .then(data => {
       const versionPromises = [];
       if (versions)
@@ -40,7 +37,7 @@ exports.handler = (event, context, callback) => {
             payload.versions = values;
           else
             payload.original = values[0].original;
-          sendResult(event.callbackURL, payload);
+          sendResult(event.callbackURL, attachment.metadata.key, payload);
         })
     })
     .catch(err => callback(err));
@@ -96,7 +93,7 @@ function formPath(prefix = null, path, { format = null, name = null }) {
   return result;
 }
 
-function sendResult (callbackURL, payload) {
+function sendResult (callbackURL, key, payload) {
   console.log('Starting PUT request to callbackURL:', callbackURL);
 
   const endpoint = new AWS.Endpoint(callbackURL);
@@ -108,7 +105,7 @@ function sendResult (callbackURL, payload) {
   request.body = JSON.stringify(payload);
 
   const signer = new AWS.Signers.V4(request, process.env.AWS_LAMBDA_FUNCTION_NAME);
-  signer.addAuthorization(AWS.config.credentials, new Date());
+  signer.addAuthorization({ accessKeyId: process.env.AWS_ACCESS_KEY_ID, secretAccessKey: key }, new Date());
 
   console.log('Request:', request);
 
