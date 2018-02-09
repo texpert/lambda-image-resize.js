@@ -62,6 +62,7 @@ function resizeToBucket(data, storages, path, version) {
 function bufferToBucket(buffer, bucket, key, version_name, storage, metadata = {}) {
   return new Promise(resolve => {
     S3.putObject({
+        ACL: bucket.upload_options.acl,
         Body : buffer,
         Bucket : bucket.name,
         Key : key },
