@@ -8,7 +8,7 @@ Resources:
     Properties:
       CodeUri: ./lambda/
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs10.x
       MemorySize: 1536
       Timeout: 60
 

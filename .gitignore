@@ -1,3 +1,4 @@
 .idea
-lambda/node_modules
+node_modules
 packaged.yaml
+.aws-sam

@@ -4,7 +4,9 @@
 
 An [AWS Lambda][aws_lambda] function for resizing images on demand.
 
-Built using the [sharp][sharp] image resizing JS library, and running on the [Node.js][nodejs] runtime.  
+Built using the [sharp][sharp] image resizing JS library, and running on the [Node.js][nodejs] runtime.
+
+_Note: currently Sharp is being built on Node.js version 10.x_  
 
 On invocation, the Lambda function will fetch the image from the 'original' S3 bucket, resize the image, upload both 
 the original and the resized image to the target S3 bucket, and return the resulting filenames to a specified 
@@ -31,7 +33,7 @@ You should have the following packages locally installed:
   To install the [sharp][sharp] library into the `lambda` folder, run in the repository root folder:
 
     ```
-    $ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs6.10 npm install --prefix=lambda
+    $ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm install --prefix=lambda
     ```
 
 - The [AWS SAM Local][aws_sam_local] CLI tool for local development and testing.
@@ -51,7 +53,7 @@ To invoke the Lambda function using the [AWS SAM Local][aws_sam_local] with an [
 with a event.json fixture file, run the following command:
 
 ```
-$ sam local invoke "ImageResizeOnDemand" -e event.json -profile texpert
+$ sam local invoke "ImageResizeOnDemand" -e event.json --profile texpert
 ```
 
 

@@ -1,16 +1,17 @@
 {
   "name": "lambda-image-resize.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "On demand image resizing AWS Lambda function",
   "author": "Aurel Branzeanu <branzeanu.aurel@gmail.com>",
   "license": "Apache-2.0",
   "main": "index.js",
   "dependencies": {
-    "sharp": "^0.19"
+    "node-gyp": "^5.0.7",
+    "sharp": "^0.23.4"
   },
   "devDependencies": {
-    "aws-sdk": "^2.179",
-    "lambda-local": "^1.4.5"
+    "aws-sdk": "^2.596",
+    "lambda-local": "^1.6.3"
   },
   "repository": {
     "type": "git",
