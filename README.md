@@ -56,6 +56,13 @@ with a event.json fixture file, run the following command:
 $ sam local invoke "ImageResizeOnDemand" -e event.json --profile texpert
 ```
 
+Or, to invoke and debug locally, run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
+
+```
+$ cd lambda
+
+$ ~/.nvm/versions/node/v10.18.0/bin/node lambda_start.js
+```
 
 ### Deploying
 
@@ -83,6 +90,7 @@ This [AWS Lambda][aws_lambda] function is [licensed][license] under Apache 2.0.
 [aws_lambda]: https://aws.amazon.com/lambda/
 [aws_profile]: https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html
 [aws_sam_local]: https://github.com/awslabs/aws-sam-local#package-and-deploy-to-lambda
+[lambda-local]: https://github.com/ashiina/lambda-local
 [license]: LICENSE
 [nodejs]: https://nodejs.org/en/
 [sharp]: https://github.com/lovell/sharp
