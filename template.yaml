@@ -1,14 +1,13 @@
-AWSTemplateFormatVersion : '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: On demand image resizing AWS Lambda function.
-
 Resources:
   ImageResizeOnDemand:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./lambda/
+      CodeUri: ./
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs14.x
       MemorySize: 1536
       Timeout: 60
 

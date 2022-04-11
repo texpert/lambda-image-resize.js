@@ -4,7 +4,7 @@ const lambdaLocal = require('lambda-local'),
 
 lambdaLocal.execute({
   event: jsonPayload,
-  lambdaPath: 'index.js',
+  lambdaPath: '../function/index.js',
   profilePath: '~/.aws/credentials',
   profileName: 'texpert',
   timeoutMs: 30000,

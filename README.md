@@ -69,8 +69,7 @@ $ ~/.nvm/versions/node/v10.18.0/bin/node lambda_start.js
 First, create a deploy package and upload it to a S3 bucket:
 
 ```
-$ sam package --template-file template.yaml --s3-bucket texpert-test-store --s3-prefix lambda/packages 
---output-template-file packaged.yaml
+$ sam package --template-file template.yaml --s3-bucket texpert-test-store --s3-prefix lambda/packages --output-template-file packaged.yaml --profile texpert 
 ```
 
 The created `packaged.yaml` file will contain the URL to the S3 bucket, which was specified in the 'package' command.
@@ -78,7 +77,7 @@ The created `packaged.yaml` file will contain the URL to the S3 bucket, which wa
 Then, deploy the package to an [AWS CloudFormation stack][aws_cloudformation]:
 
 ```
-$ sam deploy --template-file ./packaged.yaml --stack-name lambda-test --capabilities CAPABILITY_IAM
+$ sam deploy --template-file ./packaged.yaml --stack-name lambda-test --capabilities CAPABILITY_IAM --profile texpert
 ```
 
 ## License
