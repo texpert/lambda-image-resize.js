@@ -41,7 +41,32 @@ You should have the following packages locally installed:
 
 ## Usage
 
+### Build Sharp
+
+On Linux, the following simple command should just work:
+
+```
+$ yarn add sharp
+```
+
+On MacOS:
+
+- for local testing use the same `yarn add sharp` command
+- for deploying to AWS Lamda, Sharp should be compiled for Linux x64:
+
+```
+# SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm_config_arch=x64 npm_config_platform=linux yarn add sharp
+```
+
 ### Local testing
+
+Or, to invoke and debug locally, run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
+
+```
+$ node test/lambda_start.js
+```
+
+__The AWS SAM Local, described below, is pretty abandoned and of no use for now__:
 
 First, install globally the [AWS SAM Local][aws_sam_local] package.
 
@@ -53,15 +78,7 @@ To invoke the Lambda function using the [AWS SAM Local][aws_sam_local] with an [
 with a event.json fixture file, run the following command:
 
 ```
-$ sam local invoke "ImageResizeOnDemand" -e event.json --profile texpert
-```
-
-Or, to invoke and debug locally, run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
-
-```
-$ cd lambda
-
-$ ~/.nvm/versions/node/v10.18.0/bin/node lambda_start.js
+$ sam local invoke "ImageResizeOnDemand" -e test/event.json --profile texpert
 ```
 
 ### Deploying
@@ -74,10 +91,122 @@ $ sam package --template-file template.yaml --s3-bucket texpert-test-store --s3-
 
 The created `packaged.yaml` file will contain the URL to the S3 bucket, which was specified in the 'package' command.
 
-Then, deploy the package to an [AWS CloudFormation stack][aws_cloudformation]:
+Then, deploy the package to [AWS CloudFormation stack][aws_cloudformation]:
 
 ```
+# CAPABILITY_IAM is not a placeholder 
 $ sam deploy --template-file ./packaged.yaml --stack-name lambda-test --capabilities CAPABILITY_IAM --profile texpert
+```
+
+### Grant Lambda function access to the S3 buckets:
+
+See https://aws.amazon.com/premiumsupport/knowledge-center/lambda-execution-role-s3-bucket/ 
+and https://bobbyhadz.com/blog/aws-grant-lambda-access-to-s3
+
+Create an IAM role for the Lambda function that also grants access to the S3 bucket
+
+1.    Follow the steps in Creating an execution role in the IAM console.
+2.    From the list of IAM roles, choose the role that you just created.
+3.    In the Permissions tab, choose Add inline policy.
+4.    Choose the JSON tab.
+5.    Enter a resource-based IAM policy that grants access to your S3 bucket
+
+#### Example of resource based IAM Policy:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutAnalyticsConfiguration",
+                "s3:GetObjectVersionTagging",
+                "s3:CreateBucket",
+                "s3:ReplicateObject",
+                "s3:GetObjectAcl",
+                "s3:GetBucketObjectLockConfiguration",
+                "s3:DeleteBucketWebsite",
+                "s3:GetIntelligentTieringConfiguration",
+                "s3:PutLifecycleConfiguration",
+                "s3:GetObjectVersionAcl",
+                "s3:PutObjectTagging",
+                "s3:DeleteObject",
+                "s3:DeleteObjectTagging",
+                "s3:GetBucketPolicyStatus",
+                "s3:GetObjectRetention",
+                "s3:GetBucketWebsite",
+                "s3:PutReplicationConfiguration",
+                "s3:GetObjectAttributes",
+                "s3:DeleteObjectVersionTagging",
+                "s3:PutObjectLegalHold",
+                "s3:InitiateReplication",
+                "s3:GetObjectLegalHold",
+                "s3:GetBucketNotification",
+                "s3:PutBucketCORS",
+                "s3:GetReplicationConfiguration",
+                "s3:ListMultipartUploadParts",
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:PutBucketNotification",
+                "s3:PutBucketLogging",
+                "s3:PutObjectVersionAcl",
+                "s3:GetAnalyticsConfiguration",
+                "s3:PutBucketObjectLockConfiguration",
+                "s3:GetObjectVersionForReplication",
+                "s3:GetLifecycleConfiguration",
+                "s3:GetInventoryConfiguration",
+                "s3:GetBucketTagging",
+                "s3:PutAccelerateConfiguration",
+                "s3:DeleteObjectVersion",
+                "s3:GetBucketLogging",
+                "s3:ListBucketVersions",
+                "s3:ReplicateTags",
+                "s3:RestoreObject",
+                "s3:ListBucket",
+                "s3:GetAccelerateConfiguration",
+                "s3:GetObjectVersionAttributes",
+                "s3:GetBucketPolicy",
+                "s3:PutEncryptionConfiguration",
+                "s3:GetEncryptionConfiguration",
+                "s3:GetObjectVersionTorrent",
+                "s3:AbortMultipartUpload",
+                "s3:PutBucketTagging",
+                "s3:GetBucketRequestPayment",
+                "s3:GetObjectTagging",
+                "s3:GetMetricsConfiguration",
+                "s3:GetBucketOwnershipControls",
+                "s3:DeleteBucket",
+                "s3:PutBucketVersioning",
+                "s3:PutObjectAcl",
+                "s3:GetBucketPublicAccessBlock",
+                "s3:ListBucketMultipartUploads",
+                "s3:PutIntelligentTieringConfiguration",
+                "s3:PutMetricsConfiguration",
+                "s3:PutBucketOwnershipControls",
+                "s3:PutObjectVersionTagging",
+                "s3:GetBucketVersioning",
+                "s3:GetBucketAcl",
+                "s3:PutInventoryConfiguration",
+                "s3:GetObjectTorrent",
+                "s3:PutBucketWebsite",
+                "s3:PutBucketRequestPayment",
+                "s3:PutObjectRetention",
+                "s3:GetBucketCORS",
+                "s3:GetBucketLocation",
+                "s3:ReplicateDelete",
+                "s3:GetObjectVersion"
+            ],
+            "Resource": [
+                "arn:aws:s3:::texpert-test-cache",
+                "arn:aws:s3:::texpert-test-store",
+                "arn:aws:s3:::texpert-test-store/*",
+                "arn:aws:s3:::texpert-test-cache/*"
+            ]
+        }
+    ]
+}
 ```
 
 ## License
