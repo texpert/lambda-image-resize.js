@@ -30,12 +30,6 @@ You should have the following packages locally installed:
 
 - The [sharp][sharp] image resizing library;
 
-  To install the [sharp][sharp] library into the `lambda` folder, run in the repository root folder:
-
-    ```
-    $ docker run -v "$PWD":/var/task lambci/lambda:build-nodejs10.x npm install --prefix=lambda
-    ```
-
 - The [AWS SAM Local][aws_sam_local] CLI tool for local development and testing.
 
 
@@ -66,13 +60,15 @@ Or, to invoke and debug locally, run the `lambda_start.js` module, which uses th
 $ node test/lambda_start.js
 ```
 
-__The AWS SAM Local, described below, is pretty abandoned and of no use for now__:
-
-First, install globally the [AWS SAM Local][aws_sam_local] package.
+Install globally the [AWS SAM Local][aws_sam_local] package.
 
 ```
 $ npm install -g aws-sam-local
 ```
+
+__The AWS SAM Local invokation, described below, was based on the docker package 
+https://github.com/lambci/docker-lambda, which now is pretty abandoned and of no use for now.
+There is a fork, if someone still need it, though it is not supported by the AWS SAM__:
 
 To invoke the Lambda function using the [AWS SAM Local][aws_sam_local] with an [AWS credentials profile][aws_profile] 
 with a event.json fixture file, run the following command:
