@@ -3,12 +3,12 @@
     "cache": { "name": "texpert-test-cache", "prefix": "cache" },
     "store": { "name": "texpert-test-store", "prefix": "store", "upload_options": { "acl": "private" } }
   },
-  "path": "feed/3/logo/d46bd213658257d4913247d62d74760f.png",
+  "path": "florsan_homepage.png",
   "callbackURL": "https://b329-109-185-141-9.ngrok.io/rapi/lambda",
   "target_storage": "store",
   "copy_original": true,
   "context": { "record": ["Feed", 3], "name": "logo", "shrine_class": "LambdaUploader"},
-  "attachment": { "id": "doggy.png",
+  "attachment": { "id": "florsan_homepage.png",
                   "storage": "cache",
                   "metadata": {
                     "size": 64684,

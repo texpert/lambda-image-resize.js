@@ -7,7 +7,7 @@
   "main": "index.js",
   "dependencies": {
     "node-gyp": "^5.0.7",
-    "sharp": "^0.23.4"
+    "sharp": "^0.30.7"
   },
   "devDependencies": {
     "aws-sdk": "^2.596",
