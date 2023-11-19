@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "main": "index.js",
   "dependencies": {
-    "node-gyp": "^5.0.7",
+    "node-gyp": "^10.0.1",
     "sharp": "^0.32.6"
   },
   "devDependencies": {

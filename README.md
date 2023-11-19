@@ -54,13 +54,13 @@ On MacOS:
 
 ### Local testing
 
-Or, to invoke and debug locally, run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
+To invoke and debug locally, run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
 
 ```
 $ node test/lambda_start.js
 ```
 
-Install globally the [AWS SAM Local][aws_sam_local] package.
+Or, install globally the [AWS SAM Local][aws_sam_local] package.
 
 ```
 $ npm install -g aws-sam-local
