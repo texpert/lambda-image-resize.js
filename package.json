@@ -1,6 +1,6 @@
 {
   "name": "lambda-image-resize.js",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "On demand image resizing AWS Lambda function",
   "author": "Aurel Branzeanu <branzeanu.aurel@gmail.com>",
   "license": "Apache-2.0",
