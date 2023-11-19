@@ -6,7 +6,7 @@ An [AWS Lambda][aws_lambda] function for resizing images on demand.
 
 Built using the [sharp][sharp] image resizing JS library, and running on the [Node.js][nodejs] runtime.
 
-_Note: currently Sharp is being built on Node.js version 10.x_  
+_Note: currently Sharp is being built on Node.js version 20.x_  
 
 On invocation, the Lambda function will fetch the image from the 'original' S3 bucket, resize the image, upload both 
 the original and the resized image to the target S3 bucket, and return the resulting filenames to a specified 
