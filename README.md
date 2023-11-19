@@ -54,7 +54,10 @@ On MacOS:
 
 ### Local testing
 
-To invoke and debug locally, run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
+To invoke and debug locally:
+
+- Upload the `florsan_homepage.png` file into the `cache` AWS S3 bucket
+- Run the `lambda_start.js` module, which uses the [Commandline tool to run Amazon Lambda function on local machines][lambda-local]:
 
 ```
 $ node test/lambda_start.js
